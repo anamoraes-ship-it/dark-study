@@ -1,0 +1,3408 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dark Study</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #050810;
+  --bg2: #0a0f1e;
+  --bg3: #0f1628;
+  --panel: #111827;
+  --border: #1e2d4a;
+  --accent: #00d4ff;
+  --accent2: #7c3aed;
+  --accent3: #f59e0b;
+  --text: #e2e8f0;
+  --text2: #94a3b8;
+  --text3: #64748b;
+  --green: #10b981;
+  --red: #ef4444;
+  --orange: #f97316;
+  --status-watching: #f59e0b;
+  --status-done: #10b981;
+  --status-review: #7c3aed;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Exo 2', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,212,255,0.015) 2px, rgba(0,212,255,0.015) 4px);
+  pointer-events:none;
+  z-index:9999;
+}
+
+/* ========== LOGIN SCREEN ========== */
+#loginScreen {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+  flex-direction:column;
+  gap:32px;
+}
+
+.login-box {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 48px 40px;
+  width: 420px;
+  max-width: 95vw;
+  text-align: center;
+  box-shadow: 0 0 60px rgba(0,212,255,0.08);
+}
+
+.login-logo {
+  font-family: 'Orbitron', monospace;
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+}
+
+.login-sub {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 3px;
+  margin-bottom: 40px;
+}
+
+.login-desc {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.7;
+  margin-bottom: 32px;
+}
+
+.btn-google {
+  background: #fff;
+  color: #333;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 24px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  justify-content: center;
+  transition: all 0.2s;
+  font-family: 'Exo 2', sans-serif;
+}
+
+.btn-google:hover { background: #f0f0f0; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(255,255,255,0.1); }
+.btn-google:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.google-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.login-status {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 16px;
+  min-height: 18px;
+}
+
+.login-error {
+  color: var(--red);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  margin-top: 12px;
+}
+
+/* ========== GLOBAL ========== */
+.screen { display:none; }
+.screen.active { display:flex; flex-direction:column; min-height:100vh; }
+
+/* ========== HEADER ========== */
+.app-header {
+  background: linear-gradient(180deg, #000 0%, var(--bg2) 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  display:flex;
+  align-items:center;
+  gap:24px;
+  height: 64px;
+  flex-shrink:0;
+}
+
+.logo {
+  font-family: 'Orbitron', monospace;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.logo-sub {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 3px;
+  margin-top: -2px;
+}
+
+.header-right {
+  margin-left:auto;
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+
+.stat-pill {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  color: var(--accent);
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.stat-pill .dot {
+  width:6px; height:6px;
+  border-radius:50%;
+  background: var(--accent);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,100% { opacity:1; }
+  50% { opacity:0.3; }
+}
+
+/* User pill */
+.user-pill {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 14px 4px 8px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  cursor:pointer;
+  transition: all 0.2s;
+}
+
+.user-pill:hover { border-color: var(--red); }
+
+.user-avatar {
+  width:24px; height:24px;
+  border-radius:50%;
+  object-fit:cover;
+}
+
+.user-avatar-fallback {
+  width:24px; height:24px;
+  border-radius:50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:10px;
+  font-weight:700;
+  color:#fff;
+}
+
+.user-name {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  color: var(--text2);
+  max-width: 100px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* ========== HOME SCREEN ========== */
+.home-body {
+  padding: 40px 32px;
+  flex:1;
+}
+
+.section-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom: 28px;
+}
+
+.section-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: var(--text2);
+  text-transform: uppercase;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.section-title::before {
+  content:'';
+  width:3px;
+  height:16px;
+  background: var(--accent);
+  border-radius:2px;
+}
+
+.stats-row {
+  display:grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap:16px;
+  margin-bottom: 40px;
+}
+
+.stat-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  position:relative;
+  overflow:hidden;
+  transition: border-color 0.2s;
+}
+
+.stat-card::before {
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0;
+  height:2px;
+  background: var(--accent);
+}
+
+.stat-card:nth-child(2)::before { background: var(--accent2); }
+.stat-card:nth-child(3)::before { background: var(--accent3); }
+.stat-card:nth-child(4)::before { background: var(--green); }
+.stat-card:hover { border-color: var(--accent); }
+
+.stat-num {
+  font-family: 'Orbitron', monospace;
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--text);
+  line-height:1;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: 6px;
+  letter-spacing: 1px;
+}
+
+.stat-streak {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  color: var(--accent3);
+  margin-top: 8px;
+}
+
+.search-bar {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding: 12px 20px;
+  margin-bottom: 32px;
+  transition: border-color 0.2s;
+}
+
+.search-bar:focus-within { border-color: var(--accent); }
+
+.search-bar input {
+  flex:1;
+  background:none;
+  border:none;
+  outline:none;
+  color: var(--text);
+  font-family: 'Exo 2', sans-serif;
+  font-size: 14px;
+}
+
+.search-bar input::placeholder { color: var(--text3); }
+.search-icon { color: var(--text3); font-size:18px; }
+
+.filter-tabs {
+  display:flex;
+  gap:8px;
+  margin-bottom: 28px;
+  flex-wrap:wrap;
+}
+
+.filter-tab {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 12px;
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--text2);
+  cursor:pointer;
+  transition: all 0.2s;
+  letter-spacing:1px;
+}
+
+.filter-tab:hover, .filter-tab.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(0,212,255,0.08);
+}
+
+.channels-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap:20px;
+}
+
+.channel-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px;
+  cursor:pointer;
+  transition: all 0.25s;
+  position:relative;
+  overflow:hidden;
+}
+
+.channel-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0,212,255,0.12);
+}
+
+.channel-card-top {
+  display:flex;
+  align-items:flex-start;
+  gap:14px;
+  margin-bottom:16px;
+}
+
+.channel-avatar {
+  width:48px; height:48px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:'Orbitron', monospace;
+  font-size:18px;
+  font-weight:900;
+  flex-shrink:0;
+}
+
+.channel-info { flex:1; min-width:0; }
+
+.channel-name {
+  font-family:'Orbitron', monospace;
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:1px;
+  margin-bottom:4px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.channel-creator {
+  font-size:12px;
+  color: var(--text3);
+}
+
+.status-badge {
+  padding:3px 10px;
+  border-radius:20px;
+  font-size:10px;
+  font-family:'Share Tech Mono', monospace;
+  letter-spacing:1px;
+  font-weight:600;
+  flex-shrink:0;
+}
+
+.status-watching { background: rgba(245,158,11,0.15); color: var(--status-watching); border:1px solid rgba(245,158,11,0.3); }
+.status-done { background: rgba(16,185,129,0.15); color: var(--status-done); border:1px solid rgba(16,185,129,0.3); }
+.status-review { background: rgba(124,58,237,0.15); color: var(--status-review); border:1px solid rgba(124,58,237,0.3); }
+
+.channel-tags {
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-bottom:14px;
+}
+
+.tag {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size:10px;
+  color: var(--text3);
+  font-family:'Share Tech Mono', monospace;
+}
+
+.channel-meta {
+  display:flex;
+  gap:16px;
+  font-size:11px;
+  color: var(--text3);
+  font-family:'Share Tech Mono', monospace;
+}
+
+.progress-bar-wrap {
+  background: var(--bg3);
+  border-radius:4px;
+  height:3px;
+  margin-top:14px;
+  overflow:hidden;
+}
+
+.progress-bar-fill {
+  height:100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border-radius:4px;
+  transition: width 0.5s;
+}
+
+.btn-add {
+  background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(124,58,237,0.1));
+  border: 1px dashed var(--border);
+  border-radius: 14px;
+  padding: 24px;
+  cursor:pointer;
+  transition: all 0.25s;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  min-height:160px;
+  color: var(--text3);
+  font-size:13px;
+  letter-spacing:1px;
+  font-family:'Share Tech Mono', monospace;
+}
+
+.btn-add:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(0,212,255,0.05);
+}
+
+.btn-add-icon { font-size:32px; }
+
+/* ========== BUTTONS ========== */
+.btn {
+  border:none;
+  border-radius:8px;
+  padding: 10px 20px;
+  font-family:'Exo 2', sans-serif;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  transition: all 0.2s;
+  letter-spacing:0.5px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color:#fff;
+}
+.btn-primary:hover { opacity:0.85; transform:translateY(-1px); }
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text2);
+}
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+.btn-danger {
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.3);
+  color: var(--red);
+}
+.btn-danger:hover { background: rgba(239,68,68,0.2); }
+
+/* ========== MODAL ========== */
+.modal-overlay {
+  position:fixed;
+  inset:0;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter:blur(4px);
+  z-index:1000;
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
+
+.modal-overlay.open { display:flex; }
+
+.modal {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius:16px;
+  padding:32px;
+  width:520px;
+  max-width:95vw;
+  max-height:90vh;
+  overflow-y:auto;
+}
+
+.modal-title {
+  font-family:'Orbitron', monospace;
+  font-size:16px;
+  letter-spacing:2px;
+  margin-bottom:24px;
+  color: var(--accent);
+}
+
+.form-group { margin-bottom:18px; }
+
+.form-label {
+  display:block;
+  font-size:11px;
+  color: var(--text3);
+  letter-spacing:2px;
+  margin-bottom:8px;
+  font-family:'Share Tech Mono', monospace;
+}
+
+.form-input, .form-select, .form-textarea {
+  width:100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius:8px;
+  padding:10px 14px;
+  color: var(--text);
+  font-family:'Exo 2', sans-serif;
+  font-size:14px;
+  outline:none;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
+.form-textarea { resize:vertical; min-height:80px; }
+.form-select option { background: var(--bg3); }
+
+.color-status-row {
+  display:flex;
+  gap:12px;
+}
+
+.color-option {
+  flex:1;
+  border-radius:8px;
+  padding:10px;
+  border: 2px solid transparent;
+  cursor:pointer;
+  text-align:center;
+  font-size:11px;
+  font-family:'Share Tech Mono', monospace;
+  transition: all 0.2s;
+}
+
+.color-option.selected { border-color: var(--accent); }
+.co-watching { background: rgba(245,158,11,0.15); color: var(--status-watching); }
+.co-done { background: rgba(16,185,129,0.15); color: var(--status-done); }
+.co-review { background: rgba(124,58,237,0.15); color: var(--status-review); }
+
+.modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:24px; }
+
+/* ========== VIDEO SCREEN ========== */
+.video-screen-body {
+  display:flex;
+  flex:1;
+  overflow:hidden;
+}
+
+.video-main {
+  flex:1;
+  overflow-y:auto;
+  padding:24px 28px;
+}
+
+.video-sidebar {
+  width:340px;
+  flex-shrink:0;
+  background: var(--bg2);
+  border-left: 1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+.back-btn {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:none;
+  border:none;
+  color: var(--text2);
+  font-family:'Exo 2', sans-serif;
+  font-size:13px;
+  cursor:pointer;
+  padding:0;
+  margin-bottom:20px;
+  transition: color 0.2s;
+}
+
+.back-btn:hover { color: var(--accent); }
+
+.player-wrap {
+  background:#000;
+  border: 1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
+  position:relative;
+  margin-bottom:24px;
+}
+
+.player-iframe-container {
+  position:relative;
+  padding-top:56.25%;
+}
+
+.player-iframe-container iframe {
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  border:none;
+}
+
+.player-controls-bar {
+  background: var(--bg3);
+  border-top: 1px solid var(--border);
+  padding:8px 16px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.speed-label {
+  font-family:'Share Tech Mono', monospace;
+  font-size:11px;
+  color: var(--text3);
+}
+
+.speed-btn {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius:6px;
+  padding: 4px 10px;
+  font-family:'Share Tech Mono', monospace;
+  font-size:11px;
+  color: var(--text2);
+  cursor:pointer;
+  transition: all 0.15s;
+}
+
+.speed-btn:hover, .speed-btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.player-placeholder {
+  min-height:200px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  padding:32px;
+  background: var(--bg3);
+}
+
+.player-placeholder-icon { font-size:48px; opacity:0.3; }
+.player-placeholder-text { color: var(--text3); font-size:13px; text-align:center; line-height:1.6; }
+
+.url-input-row {
+  display:flex;
+  gap:8px;
+  width:100%;
+  max-width:460px;
+}
+
+.url-input-row input {
+  flex:1;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius:8px;
+  padding:8px 14px;
+  color: var(--text);
+  font-size:13px;
+  font-family:'Exo 2', sans-serif;
+  outline:none;
+}
+
+.url-input-row input:focus { border-color: var(--accent); }
+
+.transcript-section { margin-bottom:24px; }
+
+.collapsible-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius:10px;
+  padding:12px 16px;
+  cursor:pointer;
+  transition: border-color 0.2s;
+}
+
+.collapsible-header:hover { border-color: var(--accent); }
+.collapsible-header.open { border-radius:10px 10px 0 0; border-bottom-color:transparent; }
+
+.collapsible-label {
+  font-family:'Share Tech Mono', monospace;
+  font-size:12px;
+  color: var(--text2);
+  letter-spacing:1px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.collapsible-arrow { transition: transform 0.2s; color: var(--text3); }
+.collapsible-header.open .collapsible-arrow { transform:rotate(180deg); }
+
+.collapsible-body {
+  display:none;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-top:none;
+  border-radius:0 0 10px 10px;
+  padding:16px;
+}
+
+.collapsible-body.open { display:block; }
+
+.collapsible-body textarea {
+  width:100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius:8px;
+  padding:12px;
+  color: var(--text);
+  font-family:'Share Tech Mono', monospace;
+  font-size:11px;
+  line-height:1.7;
+  resize:vertical;
+  min-height:120px;
+  outline:none;
+}
+
+.collapsible-body textarea:focus { border-color: var(--accent); }
+
+.topics-section { margin-bottom:24px; }
+
+.topic-item {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius:10px;
+  margin-bottom:8px;
+  position:relative;
+  transition: border-color 0.2s;
+}
+
+.topic-header {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:14px 16px;
+  cursor:pointer;
+}
+
+.topic-num {
+  font-family:'Orbitron', monospace;
+  font-size:10px;
+  color: var(--accent);
+  min-width:24px;
+}
+
+.topic-title-text {
+  flex:1;
+  font-size:14px;
+  font-weight:600;
+}
+
+.topic-ts {
+  font-family:'Share Tech Mono', monospace;
+  font-size:10px;
+  color: var(--text3);
+}
+
+.topic-fav {
+  background:none;
+  border:none;
+  color: var(--text3);
+  cursor:pointer;
+  padding:0;
+  font-size:14px;
+  transition: color 0.2s;
+}
+
+.topic-fav.active { color: var(--accent3); }
+
+.topic-body {
+  display:none;
+  padding:0 16px 16px;
+  border-top: 1px solid var(--border);
+}
+
+.topic-body.open { display:block; }
+
+.topic-explanation {
+  font-size:13px;
+  line-height:1.8;
+  color: var(--text2);
+  margin-top:12px;
+}
+
+.topic-explanation ul {
+  list-style:none;
+  padding:0;
+}
+
+.topic-explanation ul li {
+  padding:6px 0 6px 16px;
+  border-bottom: 1px solid var(--border);
+  position:relative;
+}
+
+.topic-explanation ul li::before {
+  content:'›';
+  position:absolute;
+  left:0;
+  color: var(--accent);
+}
+
+.topic-explanation ul li:last-child { border-bottom:none; }
+
+.topic-note-area { margin-top:12px; }
+
+.topic-note-area textarea {
+  width:100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius:8px;
+  padding:10px 12px;
+  color: var(--text);
+  font-family:'Exo 2', sans-serif;
+  font-size:13px;
+  resize:vertical;
+  min-height:70px;
+  outline:none;
+}
+
+.topic-note-area textarea:focus { border-color: var(--accent2); }
+.topic-note-area textarea::placeholder { color: var(--text3); }
+
+.topic-diagram-hint {
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:10px;
+  color: var(--text3);
+  font-family:'Share Tech Mono', monospace;
+  margin-top:8px;
+  border: 1px dashed var(--border);
+  border-radius:6px;
+  padding:4px 10px;
+  cursor:pointer;
+  transition: all 0.2s;
+}
+
+.topic-diagram-hint:hover { border-color: var(--accent2); color: var(--accent2); }
+
+.flashcard-overlay {
+  position:fixed;
+  inset:0;
+  background: rgba(0,0,0,0.95);
+  z-index:500;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:24px;
+}
+
+.flashcard-overlay.open { display:flex; }
+
+.flashcard-box {
+  background: var(--panel);
+  border: 1px solid var(--accent);
+  border-radius:16px;
+  padding:40px;
+  width:580px;
+  max-width:95vw;
+  text-align:center;
+  min-height:300px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:20px;
+  box-shadow: 0 0 60px rgba(0,212,255,0.1);
+}
+
+.flashcard-topic-num {
+  font-family:'Orbitron', monospace;
+  font-size:11px;
+  color: var(--accent);
+  letter-spacing:3px;
+}
+
+.flashcard-question {
+  font-size:20px;
+  font-weight:700;
+  line-height:1.4;
+}
+
+.flashcard-answer {
+  display:none;
+  font-size:13px;
+  color: var(--text2);
+  line-height:1.8;
+  text-align:left;
+  border-top: 1px solid var(--border);
+  padding-top:16px;
+  width:100%;
+}
+
+.flashcard-answer.open { display:block; }
+.flashcard-controls { display:flex; gap:12px; }
+
+/* ========== SIDEBAR CHAT ========== */
+.sidebar-header {
+  padding:16px 20px;
+  border-bottom: 1px solid var(--border);
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-shrink:0;
+}
+
+.sf-avatar {
+  width:36px; height:36px;
+  border-radius:50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  flex-shrink:0;
+}
+
+.sf-name {
+  font-family:'Orbitron', monospace;
+  font-size:12px;
+  letter-spacing:2px;
+  color: var(--accent);
+}
+
+.sf-status {
+  font-size:10px;
+  color: var(--green);
+  font-family:'Share Tech Mono', monospace;
+}
+
+.sidebar-tabs {
+  display:flex;
+  border-bottom: 1px solid var(--border);
+  flex-shrink:0;
+}
+
+.sidebar-tab {
+  flex:1;
+  padding:10px;
+  text-align:center;
+  font-size:11px;
+  font-family:'Share Tech Mono', monospace;
+  color: var(--text3);
+  cursor:pointer;
+  border-bottom:2px solid transparent;
+  transition: all 0.2s;
+  letter-spacing:1px;
+}
+
+.sidebar-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.sidebar-content {
+  flex:1;
+  overflow:hidden;
+  display:none;
+  flex-direction:column;
+}
+
+.sidebar-content.active { display:flex; }
+
+/* ===== CHAT BUBBLE COLORS (themes) ===== */
+:root {
+  --bubble-ai-bg: rgba(0,212,255,0.10);
+  --bubble-ai-border: rgba(0,212,255,0.25);
+  --bubble-user-bg: rgba(245,158,11,0.12);
+  --bubble-user-border: rgba(245,158,11,0.28);
+}
+
+.chat-messages {
+  flex:1;
+  overflow-y:auto;
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.chat-msg {
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  animation: msgIn 0.2s ease;
+}
+
+.chat-msg.msg-user { align-items:flex-end; }
+.chat-msg.msg-ai  { align-items:flex-start; }
+
+@keyframes msgIn {
+  from { opacity:0; transform:translateY(6px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+/* row = avatar + bubble */
+.chat-row {
+  display:flex;
+  align-items:flex-end;
+  gap:8px;
+  max-width:88%;
+}
+
+.msg-user .chat-row { flex-direction:row-reverse; }
+
+.chat-avatar-circle {
+  width:30px; height:30px;
+  border-radius:50%;
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+  font-weight:700;
+  overflow:hidden;
+  border:1px solid var(--border);
+}
+
+.chat-avatar-circle img {
+  width:100%; height:100%;
+  object-fit:cover;
+  border-radius:50%;
+}
+
+.chat-avatar-circle.ai-circle {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+}
+
+.chat-avatar-circle.user-circle {
+  background: linear-gradient(135deg, var(--accent3), #e05);
+}
+
+.chat-msg-from {
+  font-size:10px;
+  font-family:'Share Tech Mono', monospace;
+  color: var(--text3);
+  letter-spacing:1px;
+  margin-bottom:2px;
+}
+
+.msg-user .chat-msg-from { text-align:right; padding-right:38px; }
+.msg-ai  .chat-msg-from { padding-left:38px; }
+
+.chat-msg-from .sf-tag   { color: var(--accent); }
+.chat-msg-from .user-tag { color: var(--accent3); }
+
+.chat-bubble {
+  border-radius:14px;
+  padding:10px 14px;
+  font-size:13px;
+  line-height:1.6;
+  color: var(--text);
+  word-break:break-word;
+}
+
+.chat-bubble.sf-bubble {
+  background: var(--bubble-ai-bg);
+  border: 1px solid var(--bubble-ai-border);
+  border-bottom-left-radius:4px;
+}
+
+.chat-bubble.user-bubble {
+  background: var(--bubble-user-bg);
+  border: 1px solid var(--bubble-user-border);
+  border-bottom-right-radius:4px;
+}
+
+.chat-msg-actions {
+  display:flex;
+  gap:8px;
+  opacity:0;
+  transition: opacity 0.15s;
+  padding: 0 38px;
+}
+
+.msg-user .chat-msg-actions { justify-content:flex-end; }
+
+.chat-msg:hover .chat-msg-actions { opacity:1; }
+
+.msg-del-btn {
+  background:none;
+  border:none;
+  color: var(--text3);
+  font-size:11px;
+  cursor:pointer;
+  padding:0;
+  font-family:'Share Tech Mono', monospace;
+  letter-spacing:1px;
+  transition: color 0.15s;
+}
+
+.msg-del-btn:hover { color: var(--red); }
+
+/* ===== BUBBLE COLOR PICKER ===== */
+.bubble-color-picker {
+  padding:12px 16px;
+  border-top:1px solid var(--border);
+  flex-shrink:0;
+}
+
+.bubble-color-label {
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px;
+  color:var(--text3);
+  letter-spacing:1px;
+  margin-bottom:8px;
+}
+
+.bubble-themes {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.bubble-theme-btn {
+  width:28px; height:28px;
+  border-radius:50%;
+  border:2px solid transparent;
+  cursor:pointer;
+  transition:all 0.2s;
+  position:relative;
+}
+
+.bubble-theme-btn.active,
+.bubble-theme-btn:hover {
+  border-color:#fff;
+  transform:scale(1.15);
+}
+
+.bubble-theme-btn::after {
+  content:attr(data-label);
+  position:absolute;
+  bottom:-18px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:9px;
+  white-space:nowrap;
+  color:var(--text3);
+  font-family:'Share Tech Mono',monospace;
+  opacity:0;
+  transition:opacity 0.2s;
+}
+
+.bubble-theme-btn:hover::after { opacity:1; }
+
+.chat-input-area {
+  padding:12px 16px;
+  border-top: 1px solid var(--border);
+  flex-shrink:0;
+}
+
+.chat-input-row {
+  display:flex;
+  gap:8px;
+  align-items:flex-end;
+}
+
+.chat-input-row textarea {
+  flex:1;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius:8px;
+  padding:10px 12px;
+  color: var(--text);
+  font-family:'Exo 2', sans-serif;
+  font-size:13px;
+  resize:none;
+  min-height:42px;
+  max-height:120px;
+  outline:none;
+  line-height:1.5;
+}
+
+.chat-input-row textarea:focus { border-color: var(--accent); }
+.chat-input-row textarea::placeholder { color: var(--text3); }
+
+.chat-send-btn {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border:none;
+  border-radius:8px;
+  width:38px;
+  height:38px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:16px;
+  transition: opacity 0.2s;
+  flex-shrink:0;
+}
+
+.chat-send-btn:hover { opacity:0.8; }
+.chat-send-btn:disabled { opacity:0.4; cursor:not-allowed; }
+
+.chat-thinking {
+  display:flex;
+  align-items:center;
+  gap:4px;
+  padding:4px 0;
+}
+
+.chat-thinking span {
+  width:5px; height:5px;
+  border-radius:50%;
+  background: var(--accent);
+  animation: bounce 1.2s infinite;
+}
+
+.chat-thinking span:nth-child(2) { animation-delay:0.2s; }
+.chat-thinking span:nth-child(3) { animation-delay:0.4s; }
+
+@keyframes bounce {
+  0%,60%,100% { transform:translateY(0); }
+  30% { transform:translateY(-6px); }
+}
+
+.insights-panel {
+  flex:1;
+  overflow-y:auto;
+  padding:16px;
+}
+
+.insight-item {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius:8px;
+  padding:12px;
+  margin-bottom:10px;
+  position:relative;
+}
+
+.insight-ts {
+  font-family:'Share Tech Mono', monospace;
+  font-size:10px;
+  color: var(--accent);
+  margin-bottom:6px;
+}
+
+.insight-text { font-size:13px; color: var(--text); line-height:1.5; }
+
+.insight-del {
+  position:absolute;
+  top:8px; right:8px;
+  background:none;
+  border:none;
+  color: var(--text3);
+  cursor:pointer;
+  font-size:12px;
+  opacity:0;
+  transition: all 0.15s;
+}
+
+.insight-item:hover .insight-del { opacity:1; }
+.insight-item:hover .insight-del:hover { color: var(--red); }
+
+.quick-insight-input {
+  border-top: 1px solid var(--border);
+  padding:12px 16px;
+  flex-shrink:0;
+  display:flex;
+  gap:8px;
+}
+
+.quick-insight-input input {
+  flex:1;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius:8px;
+  padding:8px 12px;
+  color: var(--text);
+  font-size:13px;
+  font-family:'Exo 2', sans-serif;
+  outline:none;
+}
+
+.quick-insight-input input:focus { border-color: var(--accent3); }
+.quick-insight-input input::placeholder { color: var(--text3); }
+
+.summary-panel {
+  flex:1;
+  padding:16px;
+  overflow-y:auto;
+}
+
+.summary-area {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius:10px;
+  padding:16px;
+  width:100%;
+  min-height:120px;
+  color: var(--text);
+  font-family:'Exo 2', sans-serif;
+  font-size:13px;
+  line-height:1.7;
+  resize:none;
+  outline:none;
+}
+
+.summary-area:focus { border-color: var(--accent2); }
+.summary-area::placeholder { color: var(--text3); }
+
+.summary-label {
+  font-size:11px;
+  color: var(--text3);
+  font-family:'Share Tech Mono', monospace;
+  letter-spacing:1px;
+  margin-bottom:8px;
+}
+
+::-webkit-scrollbar { width:4px; height:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius:2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+.video-toolbar {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:20px;
+  flex-wrap:wrap;
+}
+
+.tool-btn {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius:8px;
+  padding:7px 14px;
+  font-size:11px;
+  font-family:'Share Tech Mono', monospace;
+  color: var(--text2);
+  cursor:pointer;
+  transition: all 0.2s;
+  letter-spacing:1px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.tool-btn:hover { border-color: var(--accent); color: var(--accent); }
+.tool-btn.danger:hover { border-color: var(--red); color: var(--red); }
+
+.empty-state {
+  grid-column: 1/-1;
+  text-align:center;
+  padding:60px 20px;
+  color: var(--text3);
+}
+
+.empty-icon { font-size:48px; margin-bottom:16px; opacity:0.3; }
+.empty-text { font-size:14px; line-height:1.6; }
+
+/* Sync indicator */
+.sync-indicator {
+  font-family:'Share Tech Mono', monospace;
+  font-size:10px;
+  color: var(--text3);
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.sync-dot {
+  width:6px; height:6px;
+  border-radius:50%;
+  background: var(--green);
+}
+
+.sync-dot.syncing {
+  background: var(--accent3);
+  animation: pulse 1s infinite;
+}
+
+/* ===== LIGHT THEME ===== */
+body.light-theme {
+  --bg: #f0f4f8;
+  --bg2: #e2e8f0;
+  --bg3: #cbd5e1;
+  --panel: #ffffff;
+  --border: #cbd5e1;
+  --text: #0f172a;
+  --text2: #334155;
+  --text3: #64748b;
+}
+
+body.light-theme .app-header {
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+}
+
+/* ===== GEAR / SETTINGS BUTTON ===== */
+.gear-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s;
+  position: relative;
+}
+.gear-btn:hover { border-color: var(--accent); transform: rotate(30deg); }
+
+/* ===== SETTINGS DROPDOWN ===== */
+.settings-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  width: 260px;
+  z-index: 500;
+  display: none;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+.settings-dropdown.open { display: flex; }
+
+.settings-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.settings-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  color: var(--text2);
+  letter-spacing: 1px;
+}
+
+.toggle-switch {
+  width: 38px; height: 20px;
+  background: var(--border);
+  border-radius: 20px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s;
+  border: none;
+  flex-shrink: 0;
+}
+.toggle-switch.on { background: var(--accent); }
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  width: 14px; height: 14px;
+  background: #fff;
+  border-radius: 50%;
+  top: 3px; left: 3px;
+  transition: left 0.2s;
+}
+.toggle-switch.on::after { left: 21px; }
+
+.photo-upload-btn {
+  background: var(--bg3);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 1px;
+  width: 100%;
+  text-align: center;
+}
+.photo-upload-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+.settings-avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.settings-avatar-preview {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: 1px solid var(--border);
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.settings-avatar-preview img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+
+/* ===== CHANNEL SCREEN (lista de vídeos) ===== */
+#channelScreen { background: var(--bg); }
+
+.channel-screen-body {
+  padding: 32px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.channel-screen-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.channel-screen-avatar {
+  width: 56px; height: 56px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Orbitron', monospace;
+  font-size: 20px; font-weight: 900;
+  flex-shrink: 0;
+}
+
+.channel-screen-name {
+  font-family: 'Orbitron', monospace;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.channel-screen-tags {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.videos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.video-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.25s;
+  position: relative;
+}
+.video-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0,212,255,0.1);
+}
+
+.video-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.video-card-meta {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: var(--text3);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.video-card-delete {
+  position: absolute;
+  top: 10px; right: 10px;
+  background: none;
+  border: none;
+  color: var(--text3);
+  font-size: 14px;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.15s;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.video-card:hover .video-card-delete { opacity: 1; }
+.video-card-delete:hover { color: var(--red); background: rgba(239,68,68,0.1); }
+
+.btn-add-video {
+  background: linear-gradient(135deg, rgba(0,212,255,0.08), rgba(124,58,237,0.08));
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--text3);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  min-height: 100px;
+}
+.btn-add-video:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(0,212,255,0.05);
+}
+
+/* ===== Loading overlay */
+#loadingOverlay {
+  position:fixed;
+  inset:0;
+  background: var(--bg);
+  z-index:9998;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:24px;
+}
+
+.loading-logo {
+  font-family:'Orbitron', monospace;
+  font-size:32px;
+  font-weight:900;
+  letter-spacing:6px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.loading-bar-wrap {
+  width:200px;
+  height:2px;
+  background: var(--border);
+  border-radius:2px;
+  overflow:hidden;
+}
+
+.loading-bar-fill {
+  height:100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border-radius:2px;
+  animation: loadingAnim 1.5s ease-in-out infinite;
+}
+
+@keyframes loadingAnim {
+  0% { width:0%; margin-left:0; }
+  50% { width:60%; margin-left:20%; }
+  100% { width:0%; margin-left:100%; }
+}
+
+.loading-text {
+  font-family:'Share Tech Mono', monospace;
+  font-size:11px;
+  color: var(--text3);
+  letter-spacing:2px;
+}
+</style>
+</head>
+<body>
+
+<!-- Loading -->
+<div id="loadingOverlay">
+  <div class="loading-logo">DARK STUDY</div>
+  <div class="loading-bar-wrap"><div class="loading-bar-fill"></div></div>
+  <div class="loading-text">CONECTANDO...</div>
+</div>
+
+<!-- ===== LOGIN SCREEN ===== -->
+<div id="loginScreen" style="display:none;">
+  <div class="login-box">
+    <div class="login-logo">DARK STUDY</div>
+    <div class="login-sub">KNOWLEDGE VAULT // SISTEMA DE ESTUDO</div>
+    <div class="login-desc">
+      Entre com sua conta Google para acessar seus estudos de qualquer computador, celular ou navegador — tudo sincronizado na nuvem.
+    </div>
+    <button class="btn-google" id="googleLoginBtn" onclick="loginWithGoogle()">
+      <svg class="google-icon" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+      </svg>
+      ENTRAR COM GOOGLE
+    </button>
+    <div class="login-status" id="loginStatus"></div>
+    <div class="login-error" id="loginError" style="display:none;"></div>
+  </div>
+</div>
+
+<!-- ===== HOME SCREEN ===== -->
+<div id="homeScreen" class="screen">
+  <header class="app-header">
+    <div>
+      <div class="logo">DARK STUDY</div>
+      <div class="logo-sub" style="color:var(--accent);letter-spacing:2px;font-size:11px;">SISTEMA DE ESTUDO</div>
+    </div>
+    <div class="header-right">
+      <div class="stat-pill"><span class="dot"></span><span id="hStatVideos">0</span> VÍDEOS</div>
+      <div class="stat-pill"><span class="dot" style="background:var(--accent2)"></span><span id="hStatDias">0</span> DIAS</div>
+      <div id="apiKeyStatus" onclick="openApiKeyModal()" style="cursor:pointer;display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:4px 14px;font-family:'Share Tech Mono',monospace;font-size:11px;transition:all 0.2s;" title="Configurar chave da API">
+        <span id="apiKeyDot" style="width:6px;height:6px;border-radius:50%;background:var(--red);display:inline-block;animation:pulse 2s infinite;"></span>
+        <span id="apiKeyLabel" style="color:var(--red);">SEM API KEY</span>
+      </div>
+      <div class="sync-indicator" id="syncIndicator">
+        <div class="sync-dot" id="syncDot"></div>
+        <span id="syncLabel">SINCRONIZADO</span>
+      </div>
+      <!-- Settings gear -->
+      <div style="position:relative;">
+        <div class="gear-btn" onclick="toggleSettings()" title="Configurações">⚙️</div>
+        <div class="settings-dropdown" id="settingsDropdown">
+          <div class="settings-title">CONFIGURAÇÕES</div>
+
+          <!-- Tema -->
+          <div class="settings-row">
+            <span class="settings-label">☀ TEMA CLARO</span>
+            <button class="toggle-switch" id="themeToggle" onclick="toggleTheme()"></button>
+          </div>
+
+          <!-- Foto do usuário -->
+          <div>
+            <div class="settings-label" style="margin-bottom:8px;">👤 SUA FOTO</div>
+            <div class="settings-avatar-row">
+              <div class="settings-avatar-preview" id="settingsUserPreview">?</div>
+              <label class="photo-upload-btn" style="flex:1;cursor:pointer;">
+                📤 TROCAR FOTO
+                <input type="file" accept="image/*" style="display:none" onchange="uploadUserPhoto(event)">
+              </label>
+            </div>
+          </div>
+
+          <!-- Foto da Kamylly -->
+          <div>
+            <div class="settings-label" style="margin-bottom:8px;">🤖 FOTO DA KAMYLLY</div>
+            <div class="settings-avatar-row">
+              <div class="settings-avatar-preview" id="settingsKamyllyPreview">🤖</div>
+              <label class="photo-upload-btn" style="flex:1;cursor:pointer;">
+                📤 TROCAR FOTO
+                <input type="file" accept="image/*" style="display:none" onchange="uploadKamyllyPhoto(event)">
+              </label>
+            </div>
+          </div>
+
+          <!-- Sair -->
+          <button class="btn btn-danger" style="width:100%;font-size:11px;" onclick="confirmLogout()">⏻ SAIR DA CONTA</button>
+        </div>
+      </div>
+      <!-- User pill (só foto + nome, sem logout direto) -->
+      <div class="user-pill" onclick="toggleSettings()" title="Configurações">
+        <img id="userAvatar" class="user-avatar" src="" style="display:none;">
+        <div id="userAvatarFallback" class="user-avatar-fallback">?</div>
+        <span class="user-name" id="userName">—</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="home-body">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-num" id="statTotal">0</div>
+        <div class="stat-label">VÍDEOS ESTUDADOS</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statDone">0</div>
+        <div class="stat-label">CONCLUÍDOS</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statInsights">0</div>
+        <div class="stat-label">INSIGHTS CAPTURADOS</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statStreak">1</div>
+        <div class="stat-label">DIAS EM SEQUÊNCIA</div>
+        <div class="stat-streak">🔥 MANTENHA O RITMO</div>
+      </div>
+    </div>
+
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Buscar em todos os canais, vídeos e tópicos..." id="globalSearch" oninput="filterChannels()">
+    </div>
+
+    <div class="filter-tabs">
+      <div class="filter-tab active" onclick="setFilter('all', this)">TODOS</div>
+      <div class="filter-tab" onclick="setFilter('watching', this)">ASSISTINDO</div>
+      <div class="filter-tab" onclick="setFilter('done', this)">CONCLUÍDOS</div>
+      <div class="filter-tab" onclick="setFilter('review', this)">REVISAR</div>
+    </div>
+
+    <div class="section-header">
+      <div class="section-title">CANAIS</div>
+      <button class="btn btn-primary" onclick="openAddModal()" style="font-size:12px;padding:8px 16px;">+ NOVO CANAL</button>
+    </div>
+
+    <div class="channels-grid" id="channelsGrid"></div>
+
+    <!-- Kamylly Home Panel -->
+    <div style="margin-top:40px;border-top:1px solid var(--border);padding-top:32px;">
+      <div class="section-header">
+        <div class="section-title">🤖 KAMYLLY — ASSISTENTE GERAL</div>
+      </div>
+      <div style="background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden;">
+        <div style="display:flex;align-items:center;gap:12px;padding:16px;border-bottom:1px solid var(--border);">
+          <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:18px;">🤖</div>
+          <div>
+            <div style="font-family:'Orbitron',monospace;font-size:12px;letter-spacing:2px;color:var(--accent);">KAMYLLY</div>
+            <div style="font-size:10px;color:var(--green);font-family:'Share Tech Mono',monospace;">● ASSISTENTE GERAL</div>
+          </div>
+        </div>
+        <div class="chat-messages" id="homeChatMessages" style="height:300px;"></div>
+        <div class="bubble-color-picker" style="border-top:1px solid var(--border);padding:10px 16px;">
+          <div class="bubble-color-label">COR DOS BALÕES</div>
+          <div class="bubble-themes" id="homeBubbleThemes"></div>
+        </div>
+        <div class="chat-input-area">
+          <div class="chat-input-row">
+            <textarea id="homeChatInput" placeholder="Pergunte qualquer coisa para a Kamylly..." rows="1" onkeydown="homeChatKeydown(event)"></textarea>
+            <button class="chat-send-btn" id="homeChatSendBtn" onclick="sendHomeChat()">➤</button>
+          </div>
+          <div style="font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace;margin-top:6px;letter-spacing:1px;">ENTER para enviar · SHIFT+ENTER nova linha</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CHANNEL SCREEN (lista de vídeos) ===== -->
+<div id="channelScreen" class="screen">
+  <header class="app-header">
+    <div>
+      <div class="logo">DARK STUDY</div>
+      <div class="logo-sub" style="color:var(--accent);font-size:11px;letter-spacing:2px;" id="channelScreenSubtitle">CANAL</div>
+    </div>
+    <div class="header-right">
+      <div class="sync-indicator" id="syncIndicator2">
+        <div class="sync-dot" id="syncDot2"></div>
+        <span id="syncLabel2">SINCRONIZADO</span>
+      </div>
+      <button class="tool-btn" onclick="goHome()">← VOLTAR</button>
+    </div>
+  </header>
+  <div class="channel-screen-body">
+    <div class="channel-screen-header">
+      <div class="channel-screen-avatar" id="csAvatar"></div>
+      <div>
+        <div class="channel-screen-name" id="csName">—</div>
+        <div class="channel-screen-tags" id="csTags"></div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
+        <div class="status-badge" id="csStatus"></div>
+        <button class="tool-btn" onclick="openStatusModalFromChannel()">🎯 STATUS</button>
+        <button class="tool-btn danger" onclick="deleteCurrentChannel()">✕ EXCLUIR CANAL</button>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <div class="section-title">VÍDEOS DO CANAL</div>
+    </div>
+
+    <div class="videos-grid" id="videosGrid"></div>
+  </div>
+</div>
+
+<!-- ===== VIDEO SCREEN ===== -->
+<div id="videoScreen" class="screen">
+  <header class="app-header">
+    <div>
+      <div class="logo">DARK STUDY</div>
+      <div class="logo-sub">MODO ESTUDO</div>
+    </div>
+    <div class="header-right">
+      <button class="tool-btn" onclick="openFlashcard()">⚡ FLASHCARD</button>
+      <button class="tool-btn" onclick="goHome()">← VOLTAR</button>
+    </div>
+  </header>
+
+  <div class="video-screen-body">
+    <div class="video-main" id="videoMain">
+      <button class="back-btn" onclick="goHome()">← VOLTAR AOS VÍDEOS</button>
+
+      <div class="player-wrap" id="playerWrap">
+        <div class="player-placeholder" id="playerPlaceholder">
+          <div class="player-placeholder-icon">▶</div>
+          <div class="player-placeholder-text">Cole o link do YouTube para assistir aqui dentro</div>
+          <div class="url-input-row">
+            <input type="text" id="ytUrlInput" placeholder="https://youtube.com/watch?v=..." />
+            <button class="btn btn-primary" onclick="loadVideo()">CARREGAR</button>
+          </div>
+        </div>
+        <div id="playerContainer" style="display:none;">
+          <div class="player-iframe-container" id="iframeContainer">
+            <iframe id="ytIframe" allowfullscreen allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"></iframe>
+          </div>
+          <div id="playerFallback" style="display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;min-height:200px;background:#000;border-radius:12px;">
+            <div id="ytThumbWrap" style="position:relative;cursor:pointer;border-radius:8px;overflow:hidden;width:100%;max-width:400px;" onclick="openVideoExternal()">
+              <img id="ytThumb" src="" style="width:100%;border-radius:8px;display:block;" onerror="this.style.display='none'">
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);">
+                <div style="width:60px;height:60px;background:red;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;">▶</div>
+              </div>
+            </div>
+            <div style="text-align:center;">
+              <div style="color:var(--accent3);font-family:'Share Tech Mono',monospace;font-size:12px;margin-bottom:8px;">⚠ Este vídeo não permite embed — clique para abrir no YouTube</div>
+              <a id="fallbackLink" href="#" target="_blank" class="btn btn-primary" style="display:inline-block;text-decoration:none;font-size:12px;">▶ ABRIR NO YOUTUBE</a>
+              <button class="btn btn-ghost" style="margin-left:8px;font-size:11px;" onclick="removeVideo()">✕ REMOVER</button>
+            </div>
+          </div>
+          <div class="player-controls-bar">
+            <span class="speed-label">⚙ VELOCIDADE:</span>
+            <button class="speed-btn" onclick="setSpeed(0.5)">0.5x</button>
+            <button class="speed-btn" onclick="setSpeed(0.75)">0.75x</button>
+            <button class="speed-btn active" onclick="setSpeed(1)">1x</button>
+            <button class="speed-btn" onclick="setSpeed(1.25)">1.25x</button>
+            <button class="speed-btn" onclick="setSpeed(1.5)">1.5x</button>
+            <button class="speed-btn" onclick="setSpeed(2)">2x</button>
+            <button class="btn-ghost btn" style="margin-left:auto;font-size:11px;padding:4px 10px;" onclick="removeVideo()">✕ REMOVER</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="video-toolbar">
+        <span style="font-family:'Orbitron',monospace;font-size:13px;font-weight:700;letter-spacing:1px;flex:1;" id="currentChannelTitle">—</span>
+        <button class="tool-btn" onclick="toggleTranscript()">📄 TRANSCRIÇÃO</button>
+        <button class="tool-btn" onclick="openFlashcard()">⚡ FLASHCARD</button>
+        <button class="tool-btn" onclick="openStatusModal()">🎯 STATUS</button>
+      </div>
+
+      <div class="transcript-section">
+        <div class="collapsible-header" id="transcriptToggle" onclick="toggleTranscript()">
+          <span class="collapsible-label">📄 TRANSCRIÇÃO DO VÍDEO</span>
+          <span class="collapsible-arrow">▼</span>
+        </div>
+        <div class="collapsible-body" id="transcriptBody">
+          <textarea id="transcriptText" placeholder="Cole aqui a transcrição do vídeo..." rows="6"></textarea>
+          <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+            <button class="btn btn-primary" style="font-size:11px;" onclick="saveTranscript()">SALVAR TRANSCRIÇÃO</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="topics-section">
+        <div class="section-header">
+          <div class="section-title">TÓPICOS</div>
+          <button class="btn btn-ghost" style="font-size:11px;" onclick="openAddTopic()">+ ADICIONAR TÓPICO</button>
+        </div>
+        <div id="topicsList"></div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="video-sidebar">
+      <div class="sidebar-header">
+        <div class="sf-avatar">🤖</div>
+        <div>
+          <div class="sf-name">KAMYLLY</div>
+          <div class="sf-status">● ONLINE — IA ATIVA</div>
+        </div>
+      </div>
+
+      <div class="sidebar-tabs">
+        <div class="sidebar-tab active" onclick="switchTab('chat', this)">CHAT</div>
+        <div class="sidebar-tab" onclick="switchTab('insights', this)">INSIGHTS</div>
+        <div class="sidebar-tab" onclick="switchTab('summary', this)">RESUMO</div>
+      </div>
+
+      <div class="sidebar-content active" id="tabChat">
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="bubble-color-picker">
+          <div class="bubble-color-label">COR DOS BALÕES</div>
+          <div class="bubble-themes" id="bubbleThemes"></div>
+        </div>
+        <div class="chat-input-area">
+          <div class="chat-input-row">
+            <textarea id="chatInput" placeholder="Pergunte para a Kamylly..." rows="1" onkeydown="chatKeydown(event)"></textarea>
+            <button class="chat-send-btn" id="chatSendBtn" onclick="sendChat()">➤</button>
+          </div>
+          <div style="font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace;margin-top:6px;letter-spacing:1px;">ENTER para enviar · SHIFT+ENTER nova linha</div>
+        </div>
+      </div>
+
+      <div class="sidebar-content" id="tabInsights" style="flex-direction:column;">
+        <div class="insights-panel" id="insightsList"></div>
+        <div class="quick-insight-input">
+          <input type="text" id="insightInput" placeholder="💡 Insight rápido..." onkeydown="if(event.key==='Enter')addInsight()">
+          <button class="btn btn-primary" style="font-size:11px;padding:6px 12px;" onclick="addInsight()">+</button>
+        </div>
+      </div>
+
+      <div class="sidebar-content" id="tabSummary" style="flex-direction:column;">
+        <div class="summary-panel">
+          <div class="summary-label">RESUMO PESSOAL (3 LINHAS)</div>
+          <textarea class="summary-area" id="summaryText" placeholder="O que ficou de mais importante desse vídeo?" rows="4" oninput="saveSummary()"></textarea>
+          <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="tool-btn" onclick="surpriseMe()">🎲 ME SURPREENDA</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODALS ===== -->
+<div class="modal-overlay" id="addVideoModal">
+  <div class="modal">
+    <div class="modal-title">+ NOVO VÍDEO</div>
+    <div class="form-group">
+      <label class="form-label">TÍTULO DO VÍDEO</label>
+      <input type="text" class="form-input" id="newVideoTitle" placeholder="Ex: 3 Filtros para Escolher Nicho">
+    </div>
+    <div class="form-group">
+      <label class="form-label">URL DO YOUTUBE (opcional)</label>
+      <input type="text" class="form-input" id="newVideoUrl" placeholder="https://youtube.com/watch?v=...">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('addVideoModal')">CANCELAR</button>
+      <button class="btn btn-primary" onclick="addVideo()">CRIAR</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <div class="modal-title">+ NOVO CANAL</div>
+    <div class="form-group">
+      <label class="form-label">NOME DO CANAL OU CRIADOR</label>
+      <input type="text" class="form-input" id="newName" placeholder="Ex: Rhaj Teixeira">
+    </div>
+    <div class="form-group">
+      <label class="form-label">TAGS (separadas por vírgula)</label>
+      <input type="text" class="form-input" id="newTags" placeholder="Canal Dark, Nichos, YouTube">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('addModal')">CANCELAR</button>
+      <button class="btn btn-primary" onclick="addChannel()">CRIAR</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="statusModal">
+  <div class="modal" style="width:380px;">
+    <div class="modal-title">ALTERAR STATUS</div>
+    <div class="color-status-row">
+      <div class="color-option co-watching" onclick="updateCurrentStatus('watching', this)">▶ ASSISTINDO</div>
+      <div class="color-option co-done" onclick="updateCurrentStatus('done', this)">✓ CONCLUÍDO</div>
+      <div class="color-option co-review" onclick="updateCurrentStatus('review', this)">↻ REVISAR</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('statusModal')">FECHAR</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="topicModal">
+  <div class="modal">
+    <div class="modal-title">+ NOVO TÓPICO</div>
+    <div class="form-group">
+      <label class="form-label">TÍTULO DO TÓPICO</label>
+      <input type="text" class="form-input" id="newTopicTitle" placeholder="Ex: Por que filtrar antes de escolher o nicho">
+    </div>
+    <div class="form-group">
+      <label class="form-label">TIMESTAMP (opcional)</label>
+      <input type="text" class="form-input" id="newTopicTs" placeholder="Ex: 0:00">
+    </div>
+    <div class="form-group">
+      <label class="form-label">EXPLICAÇÃO (uma por linha)</label>
+      <textarea class="form-input form-textarea" id="newTopicExp" placeholder="Um tópico por linha." rows="6"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('topicModal')">CANCELAR</button>
+      <button class="btn btn-primary" onclick="saveTopic()">SALVAR TÓPICO</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="apiKeyModal">
+  <div class="modal" style="width:480px;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;">
+    <div class="modal-title">🔑 CONFIGURAR KAMYLLY</div>
+    <div style="background:rgba(0,212,255,0.05);border:1px solid rgba(0,212,255,0.2);border-radius:10px;padding:16px;margin-bottom:20px;font-size:12px;color:var(--text2);line-height:1.7;font-family:'Share Tech Mono',monospace;">
+      Para a Kamylly funcionar, você precisa de uma chave da API do Google Gemini.<br><br>
+      1. Acesse: <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--accent);">aistudio.google.com/app/apikey</a><br>
+      2. Faça login com sua conta Google<br>
+      3. Clique em "Create API Key"<br>
+      4. Cole a chave abaixo<br><br>
+      <span style="color:var(--accent3);">⚠ A chave fica salva só no seu navegador (localStorage).</span>
+    </div>
+    <div class="form-group">
+      <label class="form-label">SUA API KEY</label>
+      <input type="text" class="form-input" id="apiKeyInput" placeholder="AIzaSy..." autocomplete="off" style="width:100%;">
+    </div>
+    <div id="apiKeyError" style="display:none;color:var(--red);font-size:11px;font-family:'Share Tech Mono',monospace;margin-bottom:12px;"></div>
+    <div class="modal-actions" style="flex-wrap:wrap;gap:8px;">
+      <button class="btn btn-danger" onclick="clearApiKey()" style="margin-right:auto;">REMOVER KEY</button>
+      <button class="btn btn-ghost" onclick="closeModal('apiKeyModal')">CANCELAR</button>
+      <button class="btn btn-primary" onclick="saveApiKey()">SALVAR & ATIVAR</button>
+    </div>
+  </div>
+</div>
+
+<div class="flashcard-overlay" id="flashcardOverlay">
+  <div style="font-family:'Orbitron',monospace;font-size:10px;color:var(--text3);letter-spacing:3px;" id="fcCounter">TÓPICO 1 / 1</div>
+  <div class="flashcard-box">
+    <div class="flashcard-topic-num" id="fcNum">TÓPICO 01</div>
+    <div class="flashcard-question" id="fcQuestion">—</div>
+    <div class="flashcard-answer" id="fcAnswer"></div>
+  </div>
+  <div class="flashcard-controls">
+    <button class="btn btn-ghost" onclick="fcReveal()">👁 VER RESPOSTA</button>
+    <button class="btn btn-ghost" onclick="fcNext()">→ PRÓXIMO</button>
+    <button class="btn btn-ghost" onclick="fcPrev()">← ANTERIOR</button>
+    <button class="btn btn-primary" onclick="closeFlashcard()">✕ FECHAR</button>
+  </div>
+</div>
+
+<!-- Firebase SDKs -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, query, where } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCvs6s7S5MY8Pb1JKoaLEzlQYUhAWY0iU8",
+  authDomain: "dark-study-ffe0c.firebaseapp.com",
+  projectId: "dark-study-ffe0c",
+  storageBucket: "dark-study-ffe0c.firebasestorage.app",
+  messagingSenderId: "736917773950",
+  appId: "1:736917773950:web:1a8b78d585b3e5960f022f"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ===== GLOBAL STATE =====
+let currentUser = null;
+let channels = [];
+let currentChannelId = null;
+let currentFilter = 'all';
+let chatHistory = {};
+let fcIndex = 0;
+let saveTimeout = null;
+let unsubscribeSnapshot = null;
+
+// ===== AUTH =====
+window.loginWithGoogle = async function() {
+  const btn = document.getElementById('googleLoginBtn');
+  const status = document.getElementById('loginStatus');
+  const errEl = document.getElementById('loginError');
+  btn.disabled = true;
+  status.textContent = 'CONECTANDO...';
+  errEl.style.display = 'none';
+  try {
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
+  } catch(e) {
+    btn.disabled = false;
+    status.textContent = '';
+    errEl.style.display = 'block';
+    errEl.textContent = 'Erro ao entrar: ' + (e.message || 'tente novamente.');
+  }
+};
+
+window.confirmLogout = function() {
+  if (confirm('Sair da sua conta?')) {
+    if (unsubscribeSnapshot) unsubscribeSnapshot();
+    signOut(auth);
+  }
+};
+
+onAuthStateChanged(auth, async (user) => {
+  const loading = document.getElementById('loadingOverlay');
+  if (user) {
+    currentUser = user;
+    loading.style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'none';
+    updateUserUI(user);
+    await loadUserData();
+    showScreen('homeScreen');
+  } else {
+    currentUser = null;
+    channels = [];
+    chatHistory = {};
+    loading.style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('homeScreen').classList.remove('active');
+    document.getElementById('videoScreen').classList.remove('active');
+  }
+});
+
+function updateUserUI(user) {
+  const avatarImg = document.getElementById('userAvatar');
+  const avatarFallback = document.getElementById('userAvatarFallback');
+  const nameEl = document.getElementById('userName');
+  if (user.photoURL) {
+    avatarImg.src = user.photoURL;
+    avatarImg.style.display = 'block';
+    avatarFallback.style.display = 'none';
+  } else {
+    avatarImg.style.display = 'none';
+    avatarFallback.style.display = 'flex';
+    avatarFallback.textContent = (user.displayName || user.email || '?')[0].toUpperCase();
+  }
+  const firstName = (user.displayName || user.email || 'Primo').split(' ')[0];
+  nameEl.textContent = firstName.toUpperCase();
+}
+
+// ===== FIRESTORE =====
+async function loadUserData() {
+  if (!currentUser) return;
+  setSyncing(true);
+  try {
+    const ref = doc(db, 'users', currentUser.uid);
+    const snap = await getDoc(ref);
+    if (snap.exists()) {
+      const data = snap.data();
+      channels = data.channels || [];
+      chatHistory = data.chatHistory || {};
+    } else {
+      channels = getDefaultChannels();
+      chatHistory = {};
+      await saveToFirestore();
+    }
+    // Real-time listener
+    if (unsubscribeSnapshot) unsubscribeSnapshot();
+    unsubscribeSnapshot = onSnapshot(ref, (docSnap) => {
+      if (docSnap.exists() && !saveTimeout) {
+        const data = docSnap.data();
+        channels = data.channels || [];
+        chatHistory = data.chatHistory || {};
+        renderHome();
+        renderHomeChatHistory();
+        if (currentChannelId) {
+          renderTopics();
+          renderInsights();
+          renderChat();
+        }
+      }
+    });
+  } catch(e) {
+    console.error('Erro ao carregar dados:', e);
+  }
+  setSyncing(false);
+  renderHome();
+  renderHomeChatHistory();
+  updateApiKeyStatus();
+  applyBubbleTheme(activeBubbleTheme);
+  renderBubbleThemePicker('bubbleThemes');
+  renderBubbleThemePicker('homeBubbleThemes');
+  initTheme();
+  updateSettingsPreviews();
+}
+
+async function saveToFirestore() {
+  if (!currentUser) return;
+  setSyncing(true);
+  try {
+    await setDoc(doc(db, 'users', currentUser.uid), {
+      channels,
+      chatHistory,
+      updatedAt: new Date().toISOString()
+    });
+  } catch(e) {
+    console.error('Erro ao salvar:', e);
+  }
+  setSyncing(false);
+}
+
+function scheduleSave() {
+  if (saveTimeout) clearTimeout(saveTimeout);
+  setSyncing(true, 'SALVANDO...');
+  saveTimeout = setTimeout(async () => {
+    saveTimeout = null;
+    await saveToFirestore();
+  }, 1200);
+}
+
+function setSyncing(active, label) {
+  const dot = document.getElementById('syncDot');
+  const lbl = document.getElementById('syncLabel');
+  if (!dot || !lbl) return;
+  if (active) {
+    dot.classList.add('syncing');
+    lbl.textContent = label || 'SALVANDO...';
+  } else {
+    dot.classList.remove('syncing');
+    lbl.textContent = 'SINCRONIZADO';
+  }
+}
+
+function getDefaultChannels() {
+  return [{
+    id: 'rhaj_001',
+    name: 'Rhaj Teixeira',
+    title: '3 Filtros para Escolher Nicho no YouTube Dark',
+    tags: ['Canal Dark', 'Filtros', 'Nicho', 'YouTube'],
+    status: 'watching',
+    date: new Date().toISOString().split('T')[0],
+    ytUrl: '', transcript: '', summary: '',
+    insights: [],
+    topics: [
+      { id:'t1', title:'Por que o Caminho Errado é Escolher Formato ou Nicho Primeiro', ts:'0:00', fav:false, note:'', exp:['Todo mundo quer saber qual formato ou qual nicho escolher para começar tendo sucesso com o canal Dark no YouTube.','Só que esse caminho é o caminho errado.','O caminho certo é você se perguntar: "Como eu sei que esse formato ou nicho que eu vou começar vai dar dinheiro antes de eu começar?"','Existe um processo de validação antes de entrar em qualquer nicho.','Você precisa saber se aquele formato tem expressão no algoritmo antes de investir seu tempo.'] },
+      { id:'t2', title:'Filtro 1 — Validação por Referência (Canais Âncora)', ts:'2:30', fav:false, note:'', exp:['O primeiro filtro é encontrar um canal âncora — um canal que já está tendo resultado com aquele formato.','Você precisa de uma referência validada que prove que aquele nicho está funcionando agora.','Exemplo: canal Felune com 82k, 19k e 35k views em vídeos recentes.','É um formato de baixa barreira usando IA.','Quando um canal tem expressão no algoritmo, as cópias aparecem — isso confirma que o nicho está quente.'] },
+      { id:'t3', title:'Filtro 2 — Catálogo e Sofisticação de Mercado', ts:'8:00', fav:false, note:'', exp:['O segundo filtro é analisar o catálogo e o nível de sofisticação do mercado.','Sofisticação de mercado é o quanto o público já foi exposto àquele tipo de conteúdo.','Mercado pouco sofisticado: qualquer abordagem funciona.','Mercado muito sofisticado: você precisa de diferenciação real para se destacar.'] },
+      { id:'t4', title:'Filtro 3 — Moat (Fosso Competitivo)', ts:'15:00', fav:false, note:'', exp:['O terceiro filtro é o Moat — o fosso competitivo que vai te proteger de cópias.','Moat é o que torna difícil para outros replicarem exatamente o que você faz.','Pode ser: acesso exclusivo a um tipo de conteúdo, forma de produção única, angulo narrativo específico.','Com moat, o algoritmo passa a favorecer o seu canal como referência daquele nicho.'] }
+    ]
+  }];
+}
+
+// ===== EXPOSE TO GLOBAL =====
+window._saveChannels = function() { scheduleSave(); };
+window._saveChatHistory = function() { scheduleSave(); };
+
+// ===== API KEY =====
+window.getApiKey = function() { return localStorage.getItem('ds_api_key') || ''; };
+
+window.updateApiKeyStatus = function() {
+  const key = window.getApiKey();
+  const dot = document.getElementById('apiKeyDot');
+  const label = document.getElementById('apiKeyLabel');
+  if (!dot) return;
+  if (key) {
+    dot.style.background = 'var(--green)';
+    label.style.color = 'var(--green)';
+    label.textContent = 'KAMYLLY ✓';
+  } else {
+    dot.style.background = 'var(--red)';
+    label.style.color = 'var(--red)';
+    label.textContent = 'SEM API KEY';
+  }
+};
+
+window.openApiKeyModal = function() {
+  const key = window.getApiKey();
+  document.getElementById('apiKeyInput').value = key ? '••••••••••••••••' : '';
+  document.getElementById('apiKeyError').style.display = 'none';
+  openModal('apiKeyModal');
+};
+
+window.saveApiKey = function() {
+  const val = document.getElementById('apiKeyInput').value.trim();
+  if (!val || val === '••••••••••••••••') {
+    document.getElementById('apiKeyError').textContent = 'Cole uma API key válida do Google Gemini (começa com AIzaSy...)';
+    document.getElementById('apiKeyError').style.display = 'block';
+    return;
+  }
+  if (!val.startsWith('AIza')) {
+    document.getElementById('apiKeyError').textContent = 'API key inválida. Deve começar com AIzaSy...';
+    document.getElementById('apiKeyError').style.display = 'block';
+    return;
+  }
+  localStorage.setItem('ds_api_key', val);
+  window.updateApiKeyStatus();
+  closeModal('apiKeyModal');
+};
+
+window.clearApiKey = function() {
+  if (confirm('Remover a API key?')) {
+    localStorage.removeItem('ds_api_key');
+    window.updateApiKeyStatus();
+    closeModal('apiKeyModal');
+  }
+};
+
+// ===== HELPERS =====
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function getChannel(id) { return channels.find(c => c.id === id); }
+
+// ===== HOME =====
+window.renderHome = function() {
+  const totalVideos = channels.reduce((a, c) => a + (c.videos?.length || 0), 0);
+  const doneVideos  = channels.reduce((a, c) => a + (c.videos||[]).filter(v=>v.status==='done').length, 0);
+  const insights    = channels.reduce((a, c) => a + (c.videos||[]).reduce((b, v) => b + (v.insights?.length||0), 0), 0);
+  document.getElementById('statTotal').textContent = totalVideos;
+  document.getElementById('statDone').textContent = doneVideos;
+  document.getElementById('statInsights').textContent = insights;
+  document.getElementById('hStatVideos').textContent = totalVideos;
+
+  const grid = document.getElementById('channelsGrid');
+  const q = document.getElementById('globalSearch').value.toLowerCase();
+
+  let filtered = channels.filter(c => {
+    const matchFilter = currentFilter === 'all' || c.status === currentFilter;
+    const matchSearch = !q || c.name.toLowerCase().includes(q) || (c.tags||[]).some(t => t.toLowerCase().includes(q));
+    return matchFilter && matchSearch;
+  });
+
+  grid.innerHTML = '';
+  const colors = ['#00d4ff','#7c3aed','#f59e0b','#10b981','#ef4444','#ec4899'];
+
+  filtered.forEach(ch => {
+    const color = colors[channels.indexOf(ch) % colors.length];
+    const initials = ch.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+    const videoCount = (ch.videos||[]).length;
+    const statusMap = { watching:'ASSISTINDO', done:'CONCLUÍDO', review:'REVISAR' };
+    const card = document.createElement('div');
+    card.className = 'channel-card';
+    card.onclick = () => openChannel(ch.id);
+    card.innerHTML = `
+      <div class="channel-card-top">
+        <div class="channel-avatar" style="background:linear-gradient(135deg,${color}22,${color}44);color:${color};">${initials}</div>
+        <div class="channel-info">
+          <div class="channel-name">${ch.name}</div>
+          <div class="channel-creator" style="color:var(--text3);font-size:11px;">📅 ${ch.date}</div>
+        </div>
+        <div class="status-badge status-${ch.status||'watching'}">${statusMap[ch.status]||'ASSISTINDO'}</div>
+      </div>
+      <div class="channel-tags">${(ch.tags||[]).map(t => `<span class="tag">${t}</span>`).join('')}</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text3);margin-top:8px;">🎬 ${videoCount} vídeo${videoCount!==1?'s':''}</div>
+    `;
+    grid.appendChild(card);
+  });
+
+  const addCard = document.createElement('div');
+  addCard.className = 'btn-add';
+  addCard.onclick = openAddModal;
+  addCard.innerHTML = `<div class="btn-add-icon">+</div><div>NOVO CANAL</div>`;
+  grid.appendChild(addCard);
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">Nenhum canal encontrado.</div></div>';
+    grid.appendChild(addCard);
+  }
+};
+
+window.setFilter = function(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  window.renderHome();
+};
+
+window.filterChannels = function() { window.renderHome(); };
+
+// ===== SETTINGS =====
+window.toggleSettings = function() {
+  const dd = document.getElementById('settingsDropdown');
+  dd.classList.toggle('open');
+};
+
+document.addEventListener('click', function(e) {
+  const dd = document.getElementById('settingsDropdown');
+  if (!dd) return;
+  if (!e.target.closest('.gear-btn') && !e.target.closest('.user-pill') && !e.target.closest('.settings-dropdown')) {
+    dd.classList.remove('open');
+  }
+});
+
+window.toggleTheme = function() {
+  const btn = document.getElementById('themeToggle');
+  const isLight = document.body.classList.toggle('light-theme');
+  btn.classList.toggle('on', isLight);
+  localStorage.setItem('ds_theme', isLight ? 'light' : 'dark');
+};
+
+function initTheme() {
+  const saved = localStorage.getItem('ds_theme');
+  if (saved === 'light') {
+    document.body.classList.add('light-theme');
+    const btn = document.getElementById('themeToggle');
+    if (btn) btn.classList.add('on');
+  }
+}
+
+window.uploadUserPhoto = function(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const data = e.target.result;
+    localStorage.setItem('ds_user_photo', data);
+    updateSettingsPreviews();
+    updateUserUI(currentUser);
+  };
+  reader.readAsDataURL(file);
+};
+
+window.uploadKamyllyPhoto = function(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const data = e.target.result;
+    localStorage.setItem('ds_kamylly_photo', data);
+    updateSettingsPreviews();
+    // refresh chat headers
+    document.querySelectorAll('.sf-avatar').forEach(el => {
+      el.innerHTML = `<img src="${data}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    });
+    document.querySelectorAll('.ai-circle').forEach(el => {
+      el.innerHTML = `<img src="${data}" alt="K">`;
+    });
+  };
+  reader.readAsDataURL(file);
+};
+
+function updateSettingsPreviews() {
+  const userPrev = document.getElementById('settingsUserPreview');
+  const kamPrev  = document.getElementById('settingsKamyllyPreview');
+  if (userPrev) {
+    const customPhoto = localStorage.getItem('ds_user_photo');
+    const googlePhoto = currentUser?.photoURL;
+    if (customPhoto) userPrev.innerHTML = `<img src="${customPhoto}" alt="U">`;
+    else if (googlePhoto) userPrev.innerHTML = `<img src="${googlePhoto}" alt="U">`;
+    else userPrev.textContent = currentUser ? (currentUser.displayName||currentUser.email||'P')[0].toUpperCase() : '?';
+  }
+  if (kamPrev) {
+    const kPhoto = localStorage.getItem('ds_kamylly_photo');
+    if (kPhoto) kamPrev.innerHTML = `<img src="${kPhoto}" alt="K">`;
+    else kamPrev.textContent = '🤖';
+  }
+}
+
+// ===== CHANNEL SCREEN (lista de vídeos) =====
+let currentChannelScreenId = null;
+
+window.openChannelScreen = function(id) {
+  currentChannelScreenId = id;
+  const ch = getChannel(id);
+  const colors = ['#00d4ff','#7c3aed','#f59e0b','#10b981','#ef4444','#ec4899'];
+  const color = colors[channels.indexOf(ch) % colors.length];
+  const initials = ch.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+
+  document.getElementById('channelScreenSubtitle').textContent = ch.name.toUpperCase();
+  const av = document.getElementById('csAvatar');
+  av.style.background = `linear-gradient(135deg,${color}33,${color}66)`;
+  av.style.color = color;
+  av.textContent = initials;
+  document.getElementById('csName').textContent = ch.name;
+
+  const tagsEl = document.getElementById('csTags');
+  tagsEl.innerHTML = (ch.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('');
+
+  const statusEl = document.getElementById('csStatus');
+  const statusMap = { watching:'ASSISTINDO', done:'CONCLUÍDO', review:'REVISAR' };
+  statusEl.textContent = statusMap[ch.status] || ch.status;
+  statusEl.className = `status-badge status-${ch.status}`;
+
+  renderVideos();
+  showScreen('channelScreen');
+};
+
+window.renderVideos = function() {
+  const ch = getChannel(currentChannelScreenId);
+  const grid = document.getElementById('videosGrid');
+  grid.innerHTML = '';
+  const videos = ch.videos || [];
+
+  videos.forEach((v, i) => {
+    const card = document.createElement('div');
+    card.className = 'video-card';
+    card.onclick = () => openVideo(currentChannelScreenId, v.id);
+    const topicsCount = (v.topics||[]).length;
+    const insightsCount = (v.insights||[]).length;
+    card.innerHTML = `
+      <button class="video-card-delete" onclick="event.stopPropagation();deleteVideo('${v.id}')">✕</button>
+      <div class="video-card-title">${v.title || 'Sem título'}</div>
+      <div class="video-card-meta">
+        <span>📅 ${v.date||'—'}</span>
+        <span>📌 ${topicsCount} tópicos</span>
+        <span>💡 ${insightsCount} insights</span>
+        <span class="status-badge status-${v.status||'watching'}" style="font-size:9px;padding:2px 8px;">${{watching:'ASSISTINDO',done:'CONCLUÍDO',review:'REVISAR'}[v.status||'watching']}</span>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  // Add video button
+  const addBtn = document.createElement('div');
+  addBtn.className = 'btn-add-video';
+  addBtn.onclick = () => openModal('addVideoModal');
+  addBtn.innerHTML = `<span style="font-size:24px;">+</span><span>NOVO VÍDEO</span>`;
+  grid.appendChild(addBtn);
+};
+
+window.addVideo = function() {
+  const title = document.getElementById('newVideoTitle').value.trim();
+  if (!title) { alert('Preencha o título!'); return; }
+  const url = document.getElementById('newVideoUrl').value.trim();
+  const ch = getChannel(currentChannelScreenId);
+  ch.videos = ch.videos || [];
+  ch.videos.push({
+    id: 'v_'+Date.now(),
+    title,
+    ytUrl: url,
+    date: new Date().toISOString().split('T')[0],
+    status: 'watching',
+    transcript: '',
+    summary: '',
+    insights: [],
+    topics: []
+  });
+  window._saveChannels();
+  renderVideos();
+  closeModal('addVideoModal');
+  document.getElementById('newVideoTitle').value = '';
+  document.getElementById('newVideoUrl').value = '';
+};
+
+window.deleteVideo = function(vid) {
+  if (!confirm('Excluir este vídeo?')) return;
+  const ch = getChannel(currentChannelScreenId);
+  ch.videos = (ch.videos||[]).filter(v => v.id !== vid);
+  window._saveChannels();
+  renderVideos();
+};
+
+window.deleteCurrentChannel = function() {
+  if (!confirm('Excluir este canal e todos os seus vídeos?')) return;
+  channels = channels.filter(c => c.id !== currentChannelScreenId);
+  window._saveChannels();
+  goHome();
+};
+
+window.openStatusModalFromChannel = function() {
+  currentChannelId = currentChannelScreenId;
+  openModal('statusModal');
+};
+
+// patch updateCurrentStatus to also refresh channel screen
+const _origUpdateStatus = window.updateCurrentStatus;
+window.updateCurrentStatus = function(s, el) {
+  document.querySelectorAll('#statusModal .color-option').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  const id = currentChannelId || currentChannelScreenId;
+  const ch = getChannel(id);
+  if (ch) ch.status = s;
+  window._saveChannels();
+  closeModal('statusModal');
+  // refresh channel screen status badge if open
+  const statusEl = document.getElementById('csStatus');
+  if (statusEl) {
+    const statusMap = { watching:'ASSISTINDO', done:'CONCLUÍDO', review:'REVISAR' };
+    statusEl.textContent = statusMap[s] || s;
+    statusEl.className = `status-badge status-${s}`;
+  }
+};
+
+// ===== OPEN VIDEO (from channel screen) =====
+function openVideo(channelId, videoId) {
+  currentChannelId = channelId;
+  const ch = getChannel(channelId);
+  // find video object
+  const v = (ch.videos||[]).find(x => x.id === videoId);
+  if (!v) return;
+  // store current video id on channel for save purposes
+  ch._currentVideoId = videoId;
+
+  showScreen('videoScreen');
+  document.getElementById('currentChannelTitle').textContent = `${ch.name} — ${v.title}`;
+
+  if (v.ytUrl) {
+    showPlayer(v.ytUrl);
+  } else {
+    document.getElementById('playerPlaceholder').style.display = 'flex';
+    document.getElementById('playerContainer').style.display = 'none';
+    document.getElementById('ytUrlInput').value = '';
+  }
+
+  document.getElementById('transcriptText').value = v.transcript || '';
+  document.getElementById('summaryText').value = v.summary || '';
+  renderTopicsForVideo(ch, v);
+  renderInsightsForVideo(ch, v);
+  renderChatForVideo(ch, v);
+  applyBubbleTheme(activeBubbleTheme);
+  renderBubbleThemePicker('bubbleThemes');
+}
+
+// helpers to get current video object
+function getCurrentVideo() {
+  const ch = getChannel(currentChannelId);
+  if (!ch) return null;
+  return (ch.videos||[]).find(v => v.id === ch._currentVideoId) || null;
+}
+
+// ===== OPEN CHANNEL =====
+function openChannel(id) {
+  openChannelScreen(id);
+}
+
+window.goHome = function() {
+  if (currentChannelScreenId) {
+    showScreen('channelScreen');
+  } else {
+    showScreen('homeScreen');
+    window.renderHome();
+  }
+};
+
+window.goHomeRoot = function() {
+  currentChannelScreenId = null;
+  showScreen('homeScreen');
+  window.renderHome();
+};
+
+// ===== PLAYER =====
+window.loadVideo = function() {
+  const url = document.getElementById('ytUrlInput').value.trim();
+  if (!url) return;
+  showPlayer(url);
+  const v = getCurrentVideo();
+  if (v) { v.ytUrl = url; window._saveChannels(); }
+};
+
+function showPlayer(url) {
+  const vid = extractYTId(url);
+  if (!vid) { alert('URL do YouTube inválida'); return; }
+  window._currentYtUrl = url;
+  const iframe = document.getElementById('ytIframe');
+  iframe.src = `https://www.youtube-nocookie.com/embed/${vid}?enablejsapi=1&rel=0`;
+  document.getElementById('playerPlaceholder').style.display = 'none';
+  document.getElementById('playerFallback').style.display = 'none';
+  document.getElementById('iframeContainer').style.display = 'block';
+  document.getElementById('playerContainer').style.display = 'block';
+  document.getElementById('ytThumb').src = `https://img.youtube.com/vi/${vid}/hqdefault.jpg`;
+  document.getElementById('fallbackLink').href = url;
+}
+
+window.openVideoExternal = function() { if (window._currentYtUrl) window.open(window._currentYtUrl, '_blank'); };
+
+window.removeVideo = function() {
+  document.getElementById('ytIframe').src = '';
+  document.getElementById('playerPlaceholder').style.display = 'flex';
+  document.getElementById('playerContainer').style.display = 'none';
+  const v = getCurrentVideo();
+  if (v) { v.ytUrl = ''; window._saveChannels(); }
+};
+
+window.setSpeed = function(s) {
+  document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  try { document.getElementById('ytIframe').contentWindow.postMessage(JSON.stringify({event:'command', func:'setPlaybackRate', args:[s]}), '*'); } catch(e) {}
+};
+
+function extractYTId(url) {
+  const m = url.match(/(?:v=|youtu\.be\/|embed\/)([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+
+window.addEventListener('message', function(e) {
+  if (!e.data) return;
+  try {
+    const data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+    if (data.event === 'onError' && (data.info === 101 || data.info === 150 || data.info === 100)) {
+      document.getElementById('iframeContainer').style.display = 'none';
+      document.getElementById('playerFallback').style.display = 'flex';
+    }
+  } catch(err) {}
+});
+
+// ===== TRANSCRIPT =====
+window.toggleTranscript = function() {
+  document.getElementById('transcriptToggle').classList.toggle('open');
+  document.getElementById('transcriptBody').classList.toggle('open');
+};
+
+window.saveTranscript = function() {
+  const v = getCurrentVideo();
+  if (v) { v.transcript = document.getElementById('transcriptText').value; window._saveChannels(); }
+  const btn = event.target;
+  btn.textContent = '✓ SALVO';
+  setTimeout(() => btn.textContent = 'SALVAR TRANSCRIÇÃO', 1500);
+};
+
+// ===== TOPICS (per video) =====
+function renderTopicsForVideo(ch, v) {
+  const list = document.getElementById('topicsList');
+  list.innerHTML = '';
+  (v.topics || []).forEach((t, i) => {
+    const div = document.createElement('div');
+    div.className = 'topic-item';
+    div.id = `topic_${t.id}`;
+    const bullets = (t.exp || []).map(e => `<li>${e}</li>`).join('');
+    div.innerHTML = `
+      <div class="topic-header" onclick="toggleTopic('${t.id}')">
+        <span class="topic-num">${String(i+1).padStart(2,'0')}</span>
+        <span class="topic-title-text">${t.title}</span>
+        <span class="topic-ts">${t.ts || ''}</span>
+        <button class="topic-fav ${t.fav ? 'active' : ''}" onclick="event.stopPropagation();toggleFav('${t.id}')">${t.fav ? '★' : '☆'}</button>
+        <span style="color:var(--text3);font-size:12px;margin-left:4px;">▼</span>
+      </div>
+      <div class="topic-body" id="tbody_${t.id}">
+        <div class="topic-explanation"><ul>${bullets}</ul></div>
+        <div class="topic-note-area">
+          <textarea placeholder="Sua anotação pessoal sobre este tópico..." oninput="saveTopicNote('${t.id}', this.value)">${t.note || ''}</textarea>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:6px;">
+          <button class="btn btn-danger" style="font-size:10px;padding:4px 10px;" onclick="deleteTopic('${t.id}')">✕ EXCLUIR</button>
+        </div>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+  if (!v.topics || v.topics.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3);font-size:13px;">Nenhum tópico ainda.</div>';
+  }
+}
+
+window.renderTopics = function() {
+  const v = getCurrentVideo();
+  const ch = getChannel(currentChannelId);
+  if (v) renderTopicsForVideo(ch, v);
+};
+
+// ===== INSIGHTS (per video) =====
+function renderInsightsForVideo(ch, v) {
+  const list = document.getElementById('insightsList');
+  list.innerHTML = '';
+  (v.insights || []).forEach((ins, i) => {
+    const div = document.createElement('div');
+    div.className = 'insight-item';
+    div.innerHTML = `<div class="insight-ts">💡 ${ins.ts}</div><div class="insight-text">${ins.text}</div><button class="insight-del" onclick="deleteInsight(${i})">✕</button>`;
+    list.appendChild(div);
+  });
+  if (!v.insights || v.insights.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text3);font-size:12px;">Nenhum insight ainda.</div>';
+  }
+}
+
+window.renderInsights = function() {
+  const v = getCurrentVideo();
+  const ch = getChannel(currentChannelId);
+  if (v) renderInsightsForVideo(ch, v);
+};
+
+window.toggleTopic = function(id) { document.getElementById(`tbody_${id}`)?.classList.toggle('open'); };
+
+window.toggleFav = function(id) {
+  const v = getCurrentVideo();
+  if (!v) return;
+  const t = v.topics.find(t => t.id === id);
+  if (t) { t.fav = !t.fav; window._saveChannels(); renderTopics(); }
+};
+
+window.saveTopicNote = function(id, val) {
+  const v = getCurrentVideo();
+  if (!v) return;
+  const t = v.topics.find(t => t.id === id);
+  if (t) { t.note = val; window._saveChannels(); }
+};
+
+window.deleteTopic = function(id) {
+  if (!confirm('Excluir este tópico?')) return;
+  const v = getCurrentVideo();
+  if (!v) return;
+  v.topics = v.topics.filter(t => t.id !== id);
+  window._saveChannels();
+  renderTopics();
+};
+
+window.openAddTopic = function() {
+  document.getElementById('newTopicTitle').value = '';
+  document.getElementById('newTopicTs').value = '';
+  document.getElementById('newTopicExp').value = '';
+  openModal('topicModal');
+};
+
+window.saveTopic = function() {
+  const title = document.getElementById('newTopicTitle').value.trim();
+  if (!title) return;
+  const v = getCurrentVideo();
+  if (!v) return;
+  const exp = document.getElementById('newTopicExp').value.split('\n').filter(l => l.trim());
+  v.topics = v.topics || [];
+  v.topics.push({ id:'t_'+Date.now(), title, ts:document.getElementById('newTopicTs').value.trim(), fav:false, note:'', exp });
+  window._saveChannels();
+  renderTopics();
+  closeModal('topicModal');
+};
+
+// ===== INSIGHTS =====
+window.renderInsights = function() {
+  const ch = getChannel(currentChannelId);
+  const list = document.getElementById('insightsList');
+  list.innerHTML = '';
+  (ch.insights || []).forEach((ins, i) => {
+    const div = document.createElement('div');
+    div.className = 'insight-item';
+    div.innerHTML = `<div class="insight-ts">💡 ${ins.ts}</div><div class="insight-text">${ins.text}</div><button class="insight-del" onclick="deleteInsight(${i})">✕</button>`;
+    list.appendChild(div);
+  });
+  if (!ch.insights || ch.insights.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text3);font-size:12px;">Nenhum insight ainda.</div>';
+  }
+};
+
+window.addInsight = function() {
+  const input = document.getElementById('insightInput');
+  const text = input.value.trim();
+  if (!text) return;
+  const v = getCurrentVideo();
+  if (!v) return;
+  v.insights = v.insights || [];
+  const now = new Date();
+  const ts = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+  v.insights.unshift({ text, ts });
+  window._saveChannels();
+  renderInsights();
+  input.value = '';
+  window.renderHome();
+};
+
+window.deleteInsight = function(i) {
+  const v = getCurrentVideo();
+  if (!v) return;
+  v.insights.splice(i, 1);
+  window._saveChannels();
+  renderInsights();
+};
+
+// ===== SUMMARY =====
+window.saveSummary = function() {
+  const v = getCurrentVideo();
+  if (v) { v.summary = document.getElementById('summaryText').value; window._saveChannels(); }
+};
+
+window.surpriseMe = function() {
+  const v = getCurrentVideo();
+  if (!v || !v.topics || v.topics.length === 0) return;
+  const t = v.topics[Math.floor(Math.random() * v.topics.length)];
+  openFlashcardAt(v.topics.indexOf(t));
+};
+
+// ===== BUBBLE COLOR THEMES =====
+const bubbleThemes = [
+  { id:'cyan',   label:'Cyan',    aiBg:'rgba(0,212,255,0.10)',  aiBorder:'rgba(0,212,255,0.28)',  userBg:'rgba(124,58,237,0.12)', userBorder:'rgba(124,58,237,0.30)' },
+  { id:'amber',  label:'Âmbar',   aiBg:'rgba(0,212,255,0.10)',  aiBorder:'rgba(0,212,255,0.25)',  userBg:'rgba(245,158,11,0.12)', userBorder:'rgba(245,158,11,0.28)' },
+  { id:'green',  label:'Verde',   aiBg:'rgba(16,185,129,0.12)', aiBorder:'rgba(16,185,129,0.30)', userBg:'rgba(245,158,11,0.12)', userBorder:'rgba(245,158,11,0.28)' },
+  { id:'pink',   label:'Rosa',    aiBg:'rgba(236,72,153,0.10)', aiBorder:'rgba(236,72,153,0.28)', userBg:'rgba(124,58,237,0.12)', userBorder:'rgba(124,58,237,0.30)' },
+  { id:'red',    label:'Vermelho',aiBg:'rgba(239,68,68,0.10)',  aiBorder:'rgba(239,68,68,0.28)',  userBg:'rgba(245,158,11,0.12)', userBorder:'rgba(245,158,11,0.28)' },
+  { id:'blue',   label:'Azul',    aiBg:'rgba(59,130,246,0.12)', aiBorder:'rgba(59,130,246,0.30)', userBg:'rgba(16,185,129,0.12)', userBorder:'rgba(16,185,129,0.30)' },
+  { id:'mono',   label:'Mono',    aiBg:'rgba(30,45,74,0.6)',    aiBorder:'rgba(100,116,139,0.4)', userBg:'rgba(15,22,40,0.8)',    userBorder:'rgba(100,116,139,0.3)' },
+  { id:'neon',   label:'Neon',    aiBg:'rgba(0,255,170,0.08)',  aiBorder:'rgba(0,255,170,0.30)',  userBg:'rgba(255,0,200,0.08)',  userBorder:'rgba(255,0,200,0.30)'  },
+];
+
+let activeBubbleTheme = localStorage.getItem('ds_bubble_theme') || 'amber';
+
+function applyBubbleTheme(id) {
+  const theme = bubbleThemes.find(t => t.id === id) || bubbleThemes[1];
+  const root = document.documentElement;
+  root.style.setProperty('--bubble-ai-bg',      theme.aiBg);
+  root.style.setProperty('--bubble-ai-border',  theme.aiBorder);
+  root.style.setProperty('--bubble-user-bg',    theme.userBg);
+  root.style.setProperty('--bubble-user-border',theme.userBorder);
+  activeBubbleTheme = id;
+  localStorage.setItem('ds_bubble_theme', id);
+  // update button states
+  document.querySelectorAll('.bubble-theme-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.id === id);
+  });
+}
+
+function renderBubbleThemePicker(containerId) {
+  const wrap = document.getElementById(containerId);
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  const previewColors = {
+    cyan:'#00d4ff', amber:'#f59e0b', green:'#10b981', pink:'#ec4899',
+    red:'#ef4444',  blue:'#3b82f6',  mono:'#64748b',  neon:'#00ffaa',
+  };
+  bubbleThemes.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'bubble-theme-btn' + (t.id === activeBubbleTheme ? ' active' : '');
+    btn.dataset.id = t.id;
+    btn.dataset.label = t.label;
+    btn.style.background = previewColors[t.id] || '#888';
+    btn.title = t.label;
+    btn.onclick = () => {
+      applyBubbleTheme(t.id);
+      // also refresh home chat picker if exists
+      renderBubbleThemePicker('homeBubbleThemes');
+    };
+    wrap.appendChild(btn);
+  });
+}
+
+// ===== CHAT =====
+function getChatAiAvatar() {
+  const saved = localStorage.getItem('ds_kamylly_photo');
+  if (saved) return `<img src="${saved}" alt="K">`;
+  return '🤖';
+}
+
+function getChatUserAvatar() {
+  if (currentUser && currentUser.photoURL) return `<img src="${currentUser.photoURL}" alt="U">`;
+  const saved = localStorage.getItem('ds_user_photo');
+  if (saved) return `<img src="${saved}" alt="U">`;
+  const initials = currentUser ? (currentUser.displayName || currentUser.email || 'P')[0].toUpperCase() : 'P';
+  return initials;
+}
+
+function buildMsgHTML(m, i, delFn) {
+  const isAI = m.role === 'assistant';
+  const avatarContent = isAI ? getChatAiAvatar() : getChatUserAvatar();
+  const avatarClass = isAI ? 'ai-circle' : 'user-circle';
+  const msgClass = isAI ? 'msg-ai' : 'msg-user';
+  const bubbleClass = isAI ? 'sf-bubble' : 'user-bubble';
+  const nameTag = isAI
+    ? '<span class="sf-tag">KAMYLLY</span>'
+    : '<span class="user-tag">PRIMO</span>';
+  const content = m.content.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  return `
+    <div class="chat-msg ${msgClass}">
+      <div class="chat-msg-from">${nameTag}</div>
+      <div class="chat-row">
+        <div class="chat-avatar-circle ${avatarClass}">${avatarContent}</div>
+        <div class="chat-bubble ${bubbleClass}">${content}</div>
+      </div>
+      <div class="chat-msg-actions"><button class="msg-del-btn" onclick="${delFn}(${i})">✕ apagar</button></div>
+    </div>
+  `;
+}
+
+window.renderChat = function() {
+  const msgs = chatHistory[currentChannelId] || [];
+  const container = document.getElementById('chatMessages');
+  container.innerHTML = '';
+  msgs.forEach((m, i) => {
+    container.insertAdjacentHTML('beforeend', buildMsgHTML(m, i, 'deleteMsg'));
+  });
+  container.scrollTop = container.scrollHeight;
+};
+
+// ===== CHAT (per video) =====
+function getChatKey() {
+  const ch = getChannel(currentChannelId);
+  return ch?._currentVideoId ? `${currentChannelId}__${ch._currentVideoId}` : currentChannelId;
+}
+
+function renderChatForVideo(ch, v) {
+  const key = `${ch.id}__${v.id}`;
+  const msgs = chatHistory[key] || [];
+  const container = document.getElementById('chatMessages');
+  container.innerHTML = '';
+  if (msgs.length === 0) {
+    chatHistory[key] = [{ role:'assistant', content:`Olá, Primo! Sou a **Kamylly**. Estou pronta para te ajudar a estudar **${v.title}**. \n\nCole a transcrição e me faça perguntas!` }];
+    chatHistory[key].forEach((m, i) => container.insertAdjacentHTML('beforeend', buildMsgHTML(m, i, 'deleteMsg')));
+  } else {
+    msgs.forEach((m, i) => container.insertAdjacentHTML('beforeend', buildMsgHTML(m, i, 'deleteMsg')));
+  }
+  container.scrollTop = container.scrollHeight;
+}
+
+window.renderChat = function() {
+  const key = getChatKey();
+  const msgs = chatHistory[key] || [];
+  const container = document.getElementById('chatMessages');
+  container.innerHTML = '';
+  msgs.forEach((m, i) => container.insertAdjacentHTML('beforeend', buildMsgHTML(m, i, 'deleteMsg')));
+  container.scrollTop = container.scrollHeight;
+};
+
+window.deleteMsg = function(i) {
+  const key = getChatKey();
+  if (chatHistory[key]) chatHistory[key].splice(i, 1);
+  window.renderChat();
+  window._saveChatHistory();
+};
+
+window.chatKeydown = function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+};
+
+window.sendChat = async function() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  const apiKey = window.getApiKey();
+  const key = getChatKey();
+  if (!apiKey) {
+    chatHistory[key] = chatHistory[key] || [];
+    chatHistory[key].push({ role:'assistant', content:'⚠️ Primo, configure sua **API Key** primeiro! Clique em "SEM API KEY" no topo.' });
+    window.renderChat();
+    return;
+  }
+  const v = getCurrentVideo();
+  chatHistory[key] = chatHistory[key] || [];
+  chatHistory[key].push({ role:'user', content:msg });
+  input.value = '';
+  window.renderChat();
+
+  const container = document.getElementById('chatMessages');
+  const thinking = document.createElement('div');
+  thinking.className = 'chat-msg msg-ai'; thinking.id = 'thinkingMsg';
+  thinking.innerHTML = `<div class="chat-msg-from"><span class="sf-tag">KAMYLLY</span></div><div class="chat-row"><div class="chat-avatar-circle ai-circle">${getChatAiAvatar()}</div><div class="chat-bubble sf-bubble"><div class="chat-thinking"><span></span><span></span><span></span></div></div></div>`;
+  container.appendChild(thinking);
+  container.scrollTop = container.scrollHeight;
+  document.getElementById('chatSendBtn').disabled = true;
+
+  const transcript = v?.transcript || '';
+  const topicsCtx = (v?.topics || []).map(t => `Tópico: ${t.title}\n${(t.exp||[]).join('\n')}`).join('\n\n');
+  const systemPrompt = `Você é Kamylly, uma IA assistente de estudos integrada ao app Dark Study. Você sempre chama o usuário de "Primo". Você é direta, inteligente, tem personalidade feminina e focada em ajudar o Primo a extrair o máximo conhecimento dos vídeos estudados.\n\n${transcript ? `TRANSCRIÇÃO DO VÍDEO:\n${transcript}\n\n` : ''}${topicsCtx ? `TÓPICOS:\n${topicsCtx}\n\n` : ''}\nResponda sempre em português. Use • para listas. Seja concisa e útil.`;
+
+  const history = (chatHistory[key] || []).slice(0,-1).map(m => ({ role: m.role==='assistant' ? 'model' : 'user', parts:[{text:m.content}] }));
+
+  try {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ system_instruction:{parts:[{text:systemPrompt}]}, contents:[...history, {role:'user',parts:[{text:msg}]}], generationConfig:{maxOutputTokens:1000,temperature:0.7} })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    const reply = data.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join('') || 'Não consegui processar, Primo.';
+    document.getElementById('thinkingMsg')?.remove();
+    chatHistory[key].push({ role:'assistant', content:reply });
+    window.renderChat();
+    window._saveChatHistory();
+  } catch(e) {
+    document.getElementById('thinkingMsg')?.remove();
+    chatHistory[key].push({ role:'assistant', content:`Erro ao conectar, Primo: ${e.message}` });
+    window.renderChat();
+  }
+  document.getElementById('chatSendBtn').disabled = false;
+};
+
+// ===== TABS =====
+window.switchTab = function(tab, el) {
+  document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.sidebar-content').forEach(c => c.classList.remove('active'));
+  document.getElementById(`tab${tab.charAt(0).toUpperCase()+tab.slice(1)}`).classList.add('active');
+};
+
+// ===== FLASHCARD =====
+window.openFlashcard = function() {
+  const v = getCurrentVideo();
+  if (!v || !v.topics || v.topics.length === 0) { alert('Nenhum tópico para revisar!'); return; }
+  fcIndex = 0; renderFlashcard();
+  document.getElementById('flashcardOverlay').classList.add('open');
+};
+
+function openFlashcardAt(i) {
+  fcIndex = i; renderFlashcard();
+  document.getElementById('flashcardOverlay').classList.add('open');
+}
+
+function renderFlashcard() {
+  const v = getCurrentVideo();
+  if (!v) return;
+  const t = v.topics[fcIndex];
+  document.getElementById('fcNum').textContent = `TÓPICO ${String(fcIndex+1).padStart(2,'0')}`;
+  document.getElementById('fcQuestion').textContent = t.title;
+  document.getElementById('fcCounter').textContent = `TÓPICO ${fcIndex+1} / ${v.topics.length}`;
+  const ans = document.getElementById('fcAnswer');
+  ans.classList.remove('open');
+  ans.innerHTML = (t.exp||[]).map(e=>`• ${e}`).join('<br>');
+}
+
+window.fcReveal = function() { document.getElementById('fcAnswer').classList.add('open'); };
+window.fcNext = function() { const v=getCurrentVideo(); if(v) { fcIndex=(fcIndex+1)%v.topics.length; renderFlashcard(); } };
+window.fcPrev = function() { const v=getCurrentVideo(); if(v) { fcIndex=(fcIndex-1+v.topics.length)%v.topics.length; renderFlashcard(); } };
+window.closeFlashcard = function() { document.getElementById('flashcardOverlay').classList.remove('open'); };
+
+// ===== MODALS =====
+window.openModal = function(id) { document.getElementById(id).classList.add('open'); };
+window.closeModal = function(id) { document.getElementById(id).classList.remove('open'); };
+window.openAddModal = function() { openModal('addModal'); };
+window.openStatusModal = function() { openModal('statusModal'); };
+
+window.updateCurrentStatus = function(s, el) {
+  document.querySelectorAll('#statusModal .color-option').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  const ch = getChannel(currentChannelId);
+  ch.status = s;
+  window._saveChannels();
+  closeModal('statusModal');
+};
+
+window.addChannel = function() {
+  const name = document.getElementById('newName').value.trim();
+  if (!name) { alert('Preencha o nome do canal!'); return; }
+  const tags = document.getElementById('newTags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  channels.push({ id:'ch_'+Date.now(), name, title:'', tags, status:'watching', date:new Date().toISOString().split('T')[0], ytUrl:'', transcript:'', summary:'', insights:[], topics:[] });
+  window._saveChannels();
+  window.renderHome();
+  closeModal('addModal');
+  document.getElementById('newName').value = '';
+  document.getElementById('newTags').value = '';
+};
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+});
+
+// ===== HOME CHAT =====
+window.renderHomeChatHistory = function() {
+  const msgs = chatHistory['__home__'] || [];
+  const container = document.getElementById('homeChatMessages');
+  if (!container) return;
+  container.innerHTML = '';
+  if (msgs.length === 0) {
+    container.innerHTML = `<div style="text-align:center;padding:32px;color:var(--text3);font-size:12px;font-family:'Share Tech Mono',monospace;">Olá, Primo! Sou a Kamylly.<br>Pode me perguntar qualquer coisa!</div>`;
+    return;
+  }
+  msgs.forEach((m, i) => {
+    container.insertAdjacentHTML('beforeend', buildMsgHTML(m, i, 'deleteHomeMsg'));
+  });
+  container.scrollTop = container.scrollHeight;
+};
+
+window.deleteHomeMsg = function(i) {
+  chatHistory['__home__'].splice(i, 1);
+  window._saveChatHistory();
+  window.renderHomeChatHistory();
+};
+
+window.homeChatKeydown = function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendHomeChat(); }
+};
+
+window.sendHomeChat = async function() {
+  const input = document.getElementById('homeChatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  const apiKey = window.getApiKey();
+  if (!apiKey) {
+    chatHistory['__home__'] = chatHistory['__home__'] || [];
+    chatHistory['__home__'].push({ role:'assistant', content:'⚠️ Primo, configure sua **API Key** primeiro! Clique em "SEM API KEY" no topo.' });
+    window._saveChatHistory();
+    window.renderHomeChatHistory();
+    return;
+  }
+  chatHistory['__home__'] = chatHistory['__home__'] || [];
+  chatHistory['__home__'].push({ role:'user', content:msg });
+  input.value = '';
+  window._saveChatHistory();
+  window.renderHomeChatHistory();
+
+  const container = document.getElementById('homeChatMessages');
+  const thinking = document.createElement('div');
+  thinking.className = 'chat-msg msg-ai'; thinking.id = 'homeThinkingMsg';
+  thinking.innerHTML = `<div class="chat-msg-from"><span class="sf-tag">KAMYLLY</span></div><div class="chat-row"><div class="chat-avatar-circle ai-circle">${getChatAiAvatar()}</div><div class="chat-bubble sf-bubble"><div class="chat-thinking"><span></span><span></span><span></span></div></div></div>`;
+  container.appendChild(thinking);
+  container.scrollTop = container.scrollHeight;
+  document.getElementById('homeChatSendBtn').disabled = true;
+
+  const allChannels = channels.map(ch => `Canal: ${ch.name}\nTags: ${(ch.tags||[]).join(', ')}\nTópicos: ${(ch.topics||[]).map(t=>t.title).join(', ')}`).join('\n\n');
+  const systemPrompt = `Você é Kamylly, uma IA assistente de estudos integrada ao app Dark Study. Você sempre chama o usuário de "Primo". Você é direta, inteligente e versátil.\n\nCANAIS CADASTRADOS:\n${allChannels || 'Nenhum canal ainda.'}\n\nResponda sempre em português. Use • para listas.`;
+  const history = (chatHistory['__home__'] || []).slice(0,-1).map(m => ({ role:m.role==='assistant'?'model':'user', parts:[{text:m.content}] }));
+
+  try {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ system_instruction:{parts:[{text:systemPrompt}]}, contents:[...history,{role:'user',parts:[{text:msg}]}], generationConfig:{maxOutputTokens:1000,temperature:0.7} })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    const reply = data.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join('') || 'Não consegui processar, Primo.';
+    document.getElementById('homeThinkingMsg')?.remove();
+    chatHistory['__home__'].push({ role:'assistant', content:reply });
+    window._saveChatHistory();
+    window.renderHomeChatHistory();
+  } catch(e) {
+    document.getElementById('homeThinkingMsg')?.remove();
+    chatHistory['__home__'].push({ role:'assistant', content:`Erro ao conectar, Primo: ${e.message}` });
+    window._saveChatHistory();
+    window.renderHomeChatHistory();
+  }
+  document.getElementById('homeChatSendBtn').disabled = false;
+};
+
+// ===== EXPORT / IMPORT =====
+window.exportData = function() {
+  const data = { version:2, exportedAt:new Date().toISOString(), channels, chatHistory };
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `dark-study-backup-${new Date().toISOString().split('T')[0]}.json`;
+  a.click(); URL.revokeObjectURL(url);
+};
+
+window.importData = function(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data.channels) channels = data.channels;
+      if (data.chatHistory) chatHistory = data.chatHistory;
+      await saveToFirestore();
+      window.renderHome();
+      window.renderHomeChatHistory();
+      alert('✅ Dados importados com sucesso, Primo!');
+    } catch(err) { alert('❌ Arquivo inválido.'); }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+};
+
+</script>
+</body>
+</html>
